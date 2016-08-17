@@ -7,31 +7,42 @@
         <script src="js/node.js" type="text/javascript"></script>
         <script src="js/tree.js" type="text/javascript"></script>
         <script type="text/javascript">
-            function go() {
-                let rVal = parseInt((Math.random() * 100), 10);
-                
-                var tree = new Tree();
-                tree.add('root', rVal);
+            var tree = new Tree();
 
-                for(let i = 1; i < 20; i++) {
-                    rVal = parseInt((Math.random() * 100), 10);
-                    tree.add(`node_${i.toString()}`, rVal);
+            function doRanom() {
+                tree.clear();
+                
+                tree.add('root', parseInt((Math.random() * 100), 10));
+
+                for(let i = 1; i < 100; i++) {
+                    tree.add(`node_${i.toString()}`, parseInt((Math.random() * 100), 10));
                 }
                 
                 //alert(tree.root.toString());
                 inIntegers.innerText = tree.input.join(' ');
                 treeStr.innerText = tree.root.toString();
                 outIntegers.innerText = tree.walk().join(' ');
-                tree.clear(); // если будем выводить рез-т по итерациям то чистить нельзя
+                byIterations.max = tree.count - 1;
+                byIterations.value = byIterations.max;
+                currIteration.innerText = byIterations.value;
+            }
+
+            function goToIteration(iteration) {
+                currIteration.innerText = iteration;
+                treeStr.innerText = tree.root.toIterationString(iteration);
             }
         </script>
     </head>
     <body>
         <div style="margin:  100px 100px 100px 100px;">
-            <input type="button" onclick="go()" value="click me" />
+            <input type="button" onclick="doRanom()" value="Randomize!" />
             <p>Входные данные: <span id="inIntegers"></span></p>
             <p>Дерево: <span id="treeStr"></span></p>
             <p>Результат обхода: <span id="outIntegers"></span></p>
+            <p>Результат на итерацияю: 
+                <input id="byIterations" type="range" min="0" max="0" value="0" oninput="goToIteration(this.value)" style="width: 300px;" />
+                <span id="currIteration">0</span>
+            </p>
         </div>
     </body>
 </html>

@@ -78,11 +78,11 @@ class Tree {
 
         this.dict['count']++;
     };
-	
-	// обход дерева
-	walk() {
-		return this.root ? this.root.walk() : [];
-	}
+    
+    // обход дерева
+    walk() {
+        return this.root ? this.root.walk() : [];
+    }
 
     // очистка дерева
     clear() {

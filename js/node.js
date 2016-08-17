@@ -156,10 +156,23 @@ class Node {
         return arr;
     }
 
+    // возвращает строку ноды
     toString() {
         if (this.left || this.right)
             return `${this.value}(${(this.left ? this.left.toString() : 'null')}, ${(this.right ? this.right.toString() : 'null')})`;
         else
             return this.value.toString();
+    }
+
+    // возвращает строку ноды на момент итерации
+    toIterationString(iteration) {
+        if(this.iteration <= iteration) {
+            if ((this.left && this.left.iteration <= iteration) || (this.right && this.right.iteration <= iteration))
+                return `${this.value}(${((this.left && this.left.iteration <= iteration) ? this.left.toIterationString(iteration) : 'null')}, ${((this.right && this.right.iteration <= iteration)? this.right.toIterationString(iteration) : 'null')})`;
+            else
+                return this.value.toString();
+        }
+        else
+            return 'null';
     }
 }
