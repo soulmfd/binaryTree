@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>binaryTree</title>
+        <script src="js/node.js" type="text/javascript"></script>
+        <script src="js/tree.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            function go() {
+                let rVal = parseInt((Math.random() * 100), 10);
+                
+                var tree = new Tree();
+                tree.add('root', rVal);
+
+                for(let i = 1; i < 20; i++) {
+                    rVal = parseInt((Math.random() * 100), 10);
+                    tree.add(`node_${i.toString()}`, rVal);
+                }
+                
+                //alert(tree.root.toString());
+                inIntegers.innerText = tree.input.join(' ');
+                treeStr.innerText = tree.root.toString();
+                outIntegers.innerText = tree.walk().join(' ');
+                tree.clear(); // если будем выводить рез-т по итерациям то чистить нельзя
+            }
+        </script>
+    </head>
+    <body>
+        <div style="margin:  100px 100px 100px 100px;">
+            <input type="button" onclick="go()" value="click me" />
+            <p>Входные данные: <span id="inIntegers"></span></p>
+            <p>Дерево: <span id="treeStr"></span></p>
+            <p>Результат обхода: <span id="outIntegers"></span></p>
+        </div>
+    </body>
+</html>
