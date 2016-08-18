@@ -1,11 +1,26 @@
-<!DOCTYPE html>
+<!DOCTYPE>
 
 <html lang="en">
     <head>
         <meta charset="utf-8" />
         <title>binaryTree</title>
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
         <script src="js/node.js" type="text/javascript"></script>
         <script src="js/tree.js" type="text/javascript"></script>
+        <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+        <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
+        <!--<script src="cytoscape.js/cytoscape.min.js"></script>-->
+        <script src="https://cdn.rawgit.com/cpettitt/dagre/v0.7.4/dist/dagre.min.js"></script>
+        <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-dagre/1.1.2/cytoscape-dagre.js"></script>
+
+        <style>
+            #cy {
+                width: 100%;
+                height: 600px;
+                z-index: 999;
+            }
+        </style>
+
         <script type="text/javascript">
             var tree = new Tree();
 
@@ -25,24 +40,143 @@
                 byIterations.max = tree.count - 1;
                 byIterations.value = byIterations.max;
                 currIteration.innerText = byIterations.value;
+
+                draw();
+
+                btnMovie.disabled = false;
             }
 
             function goToIteration(iteration) {
                 currIteration.innerText = iteration;
                 treeStr.innerText = tree.root.toIterationString(iteration);
+                draw(iteration);
+            }
+
+            function draw(iteration) {
+                var cy = window.cy = cytoscape({
+                    container: document.getElementById('cy'),
+
+                    boxSelectionEnabled: false,
+                    autounselectify: true,
+
+                    layout: {
+                        name: 'dagre'
+                    },
+                    
+                    style: [
+                        {
+                            selector: 'node',
+                            style: {
+                                'content': 'data(weight)',
+                                'text-opacity': 0.5,
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'background-color': '#fff68f',
+                                'width': '25px', 
+                                'height': '25px'
+                            }
+                        },
+                        
+                        {
+                            selector: 'edge',
+                            style: {
+                                'width': 4,
+                                'curve-style': 'bezier'
+                            }
+                        }
+                    ]
+                });
+
+                cy.zoom(1);
+                cy.minZoom(0.25);
+                cy.maxZoom(1);
+
+                if (iteration)
+                    drawNode(tree.root, 0, 0, 200, iteration);
+                else
+                    drawNode(tree.root, 0, 0, 200);
+                
+                cy.fit();
+			};
+
+            function drawNode(n, x, y, s, iteration) {
+                if (iteration && n.iteration > iteration)
+                    return;
+
+                cy.add({
+                    group: 'nodes',
+                    data: {
+						id: n.name,
+						weight: n.value.toString()
+					}
+                });
+                
+                cy.$(`#${n.name}`).position({
+                    x: x,
+                    y: y
+                });
+				
+                let xlpos = x - s;
+                let xrpos = x + s;
+                
+                if(n.left) {
+                    drawNode(n.left, xlpos, y + 50, (s*0.85 > 50) ? s*0.85 : 100, iteration);
+
+                    if (!iteration || n.left.iteration <= iteration)
+                        cy.add({
+                            group: 'edges',
+                            data: {
+                                id: `e${n.name}_${n.left.name}`,
+                                source: n.name,
+                                target: n.left.name
+                            },
+						    style: {
+                                'line-color': '#ff6347'
+                            }
+                        });
+                }
+
+                if(n.right) {
+                    drawNode(n.right, xrpos, y + 50, (s*0.85 > 50) ? s*0.85 : 150, iteration);
+
+                    if (!iteration || n.right.iteration <= iteration)
+                        cy.add({
+                            group: 'edges',
+                            data: {
+                                id: `e${n.name}_${n.right.name}`,
+                                source: n.name,
+                                target: n.right.name
+                            },
+						    style: {
+                                'line-color': '#32cd32'
+                            }
+                        });
+                }
+            }
+
+            function showMovie(iteration) {
+                byIterations.value = iteration;
+                treeStr.innerText = tree.root.toIterationString(iteration);
+                currIteration.innerText = byIterations.value;
+                draw(iteration);
+
+                if(iteration < byIterations.max)
+                    setTimeout(function() { showMovie(iteration + 1) }, 1000);
             }
         </script>
     </head>
     <body>
-        <div style="margin:  100px 100px 100px 100px;">
-            <input type="button" onclick="doRanom()" value="Randomize!" />
+        <div style="margin:  10px 100px 0px 100px;">
+            <input type="button" onclick="doRanom()" value="Randomize!" />&nbsp;&nbsp;<input id="btnMovie" type="button" onclick="showMovie(0)" value="Show movie!" disabled />
             <p>Входные данные: <span id="inIntegers"></span></p>
             <p>Дерево: <span id="treeStr"></span></p>
             <p>Результат обхода: <span id="outIntegers"></span></p>
             <p>Результат на итерацияю: 
-                <input id="byIterations" type="range" min="0" max="0" value="0" oninput="goToIteration(this.value)" style="width: 300px;" />
+                <input id="byIterations" type="range" min="0" max="0" value="0" oninput="goToIteration(this.value)" style="width: 500px;" />
                 <span id="currIteration">0</span>
             </p>
+            <p>Дерево</p>
+            <div id="cy"></div>
         </div>
     </body>
 </html>
