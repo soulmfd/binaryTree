@@ -34,13 +34,19 @@
 
             // добавить массив случайных чисел
             function addRandom(size) {
+                if (isNaN(parseInt(size, 10))) {
+                    console.log(`error: addRandom(${size}): ${size} не является числом`);
+                    alert(`${size} не является числом`);
+                    return;
+                }
+                
                 if (parseInt(size) > parseInt(randomCount.max)) {
                     size = randomCount.max;
-                    randomCount = randomCount.max;
+                    randomCount.value = randomCount.max;
                 }
                 else if (parseInt(size) < parseInt(randomCount.min)) {
                     size = randomCount.min;
-                    randomCount = randomCount.min;
+                    randomCount.value = randomCount.min;
                 }
                 for (let i = 0; i < size - 1; i++)
                     addDigit(parseInt((Math.random() * 100), 10), false);
@@ -51,6 +57,7 @@
             // добавить число
             function addDigit(digit, doDraw) {
                 if (isNaN(parseInt(digit, 10))) {
+                    console.log(`error: addDigit(${digit}, ${doDraw}): ${digit} не является числом`);
                     alert(`${digit} не является числом`);
                     return;
                 }
@@ -221,7 +228,7 @@
                     <input class="u-full-width" id="randomCount" type="number" placeholder="100" value="50" min="1" max="100">
                 </div>
                 <div class="seven columns">
-                    <input class="button" type="button" value="Сгенерировать массив случайных чисел" onclick="addRandom(randomCount.value)">
+                    <input class="button" type="button" value="Сгенерировать массив случайных чисел" onclick="addRandom(parseInt(randomCount.value))">
                 </div>
             </div>
             <div class="row">
@@ -257,7 +264,7 @@
                     <p></p>
                 </div>
                 <div class="two columns">
-                    <input id="btnClearTree" class="button" type="button" value="Очитить" onclick="clearTree()" disabled>
+                    <input id="btnClearTree" class="button" type="button" value="Очистить" onclick="clearTree()" disabled>
                 </div>
             </div>
             <div id="cy" class="row" style="z-index: 999; height: 600px; border-radius: 20px; background-color: #fffff0;"></div>
