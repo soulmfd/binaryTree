@@ -2,56 +2,83 @@
 
 <html lang="en">
     <head>
-        <meta charset="utf-8" />
+        <meta charset="utf-8">
         <title>binaryTree</title>
         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/skeleton.css">
+        <link rel="icon" type="image/png" href="images/favicon.png">
         <script src="js/node.js" type="text/javascript"></script>
         <script src="js/tree.js" type="text/javascript"></script>
         <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
         <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
-        <!--<script src="cytoscape.js/cytoscape.min.js"></script>-->
         <script src="https://cdn.rawgit.com/cpettitt/dagre/v0.7.4/dist/dagre.min.js"></script>
         <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-dagre/1.1.2/cytoscape-dagre.js"></script>
-
-        <style>
-            #cy {
-                width: 100%;
-                height: 600px;
-                z-index: 999;
-            }
-        </style>
 
         <script type="text/javascript">
             var tree = new Tree();
 
-            function doRanom() {
+            // очистить
+            function clearTree() {
                 tree.clear();
-                
-                tree.add('root', parseInt((Math.random() * 100), 10));
-
-                for(let i = 1; i < 100; i++) {
-                    tree.add(`node_${i.toString()}`, parseInt((Math.random() * 100), 10));
-                }
-                
-                //alert(tree.root.toString());
-                inIntegers.innerText = tree.input.join(' ');
-                treeStr.innerText = tree.root.toString();
-                outIntegers.innerText = tree.walk().join(' ');
-                byIterations.max = tree.count - 1;
+                btnMovie.disabled = true;
+                btnClearTree.disabled = true;
+                inIntegers.innerText = '';
+                //treeStr.innerText = '';
+                outIntegers.innerText = '';
+                byIterations.max = tree.count - 0;
                 byIterations.value = byIterations.max;
                 currIteration.innerText = byIterations.value;
-
                 draw();
-
-                btnMovie.disabled = false;
             }
 
+            // добавить массив случайных чисел
+            function addRandom(size) {
+                if (parseInt(size) > parseInt(randomCount.max))
+                    size = randomCount.max;
+                else if (parseInt(size) < parseInt(randomCount.min))
+                    size = randomCount.min;
+
+                for (let i = 0; i < size - 1; i++)
+                    addDigit(parseInt((Math.random() * 100), 10), false);
+
+                addDigit(parseInt((Math.random() * 100), 10), true);
+            }
+
+            // добавить число
+            function addDigit(digit, doDraw) {
+                if (isNaN(parseInt(digit, 10))) {
+                    alert(`${digit} не является числом`);
+                    return;
+                }
+                
+                tree.add(`node_${tree.count}`, digit);
+
+                if (doDraw) {
+                    inIntegers.innerText = tree.input.join(' ');
+                    //treeStr.innerText = tree.root.toString();
+                    outIntegers.innerText = tree.walk().join(' ');
+                    byIterations.max = tree.count - 1;
+                    byIterations.value = byIterations.max;
+                    currIteration.innerText = byIterations.value;
+
+                    draw();
+
+                    btnMovie.disabled = false;
+                }
+                
+                btnMovie.disabled = false;
+                btnClearTree.disabled = false   ;
+            }
+
+            // перейти к состоянию на итерацию
             function goToIteration(iteration) {
                 currIteration.innerText = iteration;
-                treeStr.innerText = tree.root.toIterationString(iteration);
+                //treeStr.innerText = tree.root.toIterationString(iteration);
                 draw(iteration);
             }
 
+            // отрисовка дерева
             function draw(iteration) {
                 var cy = window.cy = cytoscape({
                     container: document.getElementById('cy'),
@@ -93,7 +120,7 @@
 
                 if (iteration)
                     drawNode(tree.root, 0, 0, 200, iteration);
-                else
+                else if (tree.root)
                     drawNode(tree.root, 0, 0, 200);
                 
                 cy.fit();
@@ -119,7 +146,7 @@
                 let xlpos = x - s;
                 let xrpos = x + s;
                 
-                if(n.left) {
+                if (n.left) {
                     drawNode(n.left, xlpos, y + 50, (s*0.85 > 50) ? s*0.85 : 100, iteration);
 
                     if (!iteration || n.left.iteration <= iteration)
@@ -136,7 +163,7 @@
                         });
                 }
 
-                if(n.right) {
+                if (n.right) {
                     drawNode(n.right, xrpos, y + 50, (s*0.85 > 50) ? s*0.85 : 150, iteration);
 
                     if (!iteration || n.right.iteration <= iteration)
@@ -156,27 +183,81 @@
 
             function showMovie(iteration) {
                 byIterations.value = iteration;
-                treeStr.innerText = tree.root.toIterationString(iteration);
+                //treeStr.innerText = tree.root.toIterationString(iteration);
                 currIteration.innerText = byIterations.value;
                 draw(iteration);
 
-                if(iteration < byIterations.max)
+                if (iteration < byIterations.max)
                     setTimeout(function() { showMovie(iteration + 1) }, 1000);
             }
         </script>
     </head>
     <body>
-        <div style="margin:  10px 100px 0px 100px;">
-            <input type="button" onclick="doRanom()" value="Randomize!" />&nbsp;&nbsp;<input id="btnMovie" type="button" onclick="showMovie(0)" value="Show movie!" disabled />
-            <p>Входные данные: <span id="inIntegers"></span></p>
-            <p>Дерево: <span id="treeStr"></span></p>
-            <p>Результат обхода: <span id="outIntegers"></span></p>
-            <p>Результат на итерацияю: 
-                <input id="byIterations" type="range" min="0" max="0" value="0" oninput="goToIteration(this.value)" style="width: 500px;" />
-                <span id="currIteration">0</span>
-            </p>
-            <p>Дерево</p>
-            <div id="cy"></div>
+        <div class="container">
+            <div class="row">
+                <div class="column" style="margin-top: 20px;">
+                    <h4>Сортировка бинарным деревом</h4>
+                    <p>Сортировка с помощью бинарного дерева - универсальный алгоритм сортировки, заключающийся в построении двоичного дерева поиска по ключам массива (списка), с последующей сборкой результирующего массива путём обхода узлов построенного дерева.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="three columns" style="text-align: right;">Входные данные</div>
+                <div class="nine columns"><span id="inIntegers"></span></div>
+            </div>
+            <!--<div class="row">
+                <div class="three columns" style="text-align: right;">Дерево</div>
+                <div class="nine columns"><span id="treeStr"></span></div>
+            </div>-->
+            <div class="row">
+                <div class="three columns" style="text-align: right;">Результат обхода</div>
+                <div class="nine columns"><span id="outIntegers"></span></div>
+            </div>
+            <div class="row">
+                <div class="three columns" style="text-align: right;">Random</div>
+                <div class="two columns">
+                    <input class="u-full-width" id="randomCount" type="number" placeholder="100" value="50" min="1" max="100">
+                </div>
+                <div class="seven columns">
+                    <input class="button" type="button" value="Сгенерировать массив случайных чисел" onclick="addRandom(randomCount.value)">
+                </div>
+            </div>
+            <div class="row">
+                <div class="three columns" style="text-align: right;">Добавить число</div>
+                <div class="two columns">
+                    <input class="u-full-width" id="inDigit" type="number" placeholder="0" min="-1000" max="1000">
+                </div>
+                <div class="seven columns">
+                    <input class="button" type="button" value="Добавить" onclick="addDigit(parseInt(inDigit.value), true)">
+                </div>
+            </div>
+            <div class="row">
+                <div class="three columns" style="text-align: right;">Результат на итерацию:</div>
+                <div class="eight columns">
+                    <input id="byIterations" type="range" min="0" max="0" value="0" oninput="goToIteration(this.value)" class="u-full-width" />
+                </div>
+                <div class="one column">
+                    <span id="currIteration">0</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="three columns" style="text-align: right;">Пошагово</div>
+                <div class="one-half column">
+                    <input id="btnMovie" class="button" type="button" value="Показать процесс построения" onclick="showMovie(0)" disabled>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="three columns">
+                    <h4>Дерево</h4>
+                </div>
+                <div class="seven columns">
+                    <p></p>
+                </div>
+                <div class="two columns">
+                    <input id="btnClearTree" class="button" type="button" value="Очитить" onclick="clearTree()" disabled>
+                </div>
+            </div>
+            <div id="cy" class="row" style="z-index: 999; height: 600px; border-radius: 20px; background-color: #fffff0;"></div>
         </div>
     </body>
 </html>
