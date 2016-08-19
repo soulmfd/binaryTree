@@ -34,11 +34,14 @@
 
             // добавить массив случайных чисел
             function addRandom(size) {
-                if (parseInt(size) > parseInt(randomCount.max))
+                if (parseInt(size) > parseInt(randomCount.max)) {
                     size = randomCount.max;
-                else if (parseInt(size) < parseInt(randomCount.min))
+                    randomCount = randomCount.max;
+                }
+                else if (parseInt(size) < parseInt(randomCount.min)) {
                     size = randomCount.min;
-
+                    randomCount = randomCount.min;
+                }
                 for (let i = 0; i < size - 1; i++)
                     addDigit(parseInt((Math.random() * 100), 10), false);
 
