@@ -21,7 +21,8 @@
             // очистить
             function clearTree() {
                 tree.clear();
-                btnMovie.disabled = true;
+                btnShowBuildProcess.disabled = true;
+                btnShowWalkProcess.disabled = true;
                 btnClearTree.disabled = true;
                 inIntegers.innerText = '';
                 //treeStr.innerText = '';
@@ -67,17 +68,19 @@
                 if (doDraw) {
                     inIntegers.innerText = tree.input.join(' ');
                     //treeStr.innerText = tree.root.toString();
-                    outIntegers.innerText = tree.walk().join(' ');
+                    outIntegers.innerText = tree.walk().values.join(' ');
                     byIterations.max = tree.count - 1;
                     byIterations.value = byIterations.max;
                     currIteration.innerText = byIterations.value;
 
                     draw();
 
-                    btnMovie.disabled = false;
+                    btnShowBuildProcess.disabled = false;
+                    btnShowWalkProcess.disabled = false;
                 }
                 
-                btnMovie.disabled = false;
+                btnShowBuildProcess.disabled = false;
+                btnShowWalkProcess.disabled = false;
                 btnClearTree.disabled = false   ;
             }
 
@@ -191,14 +194,41 @@
                 }
             }
 
-            function showMovie(iteration) {
+            // показать процесс строительства дерева
+            function showBuildProcess(iteration) {
                 byIterations.value = iteration;
-                //treeStr.innerText = tree.root.toIterationString(iteration);
                 currIteration.innerText = byIterations.value;
+                //treeStr.innerText = tree.root.toIterationString(iteration);
                 draw(iteration);
 
                 if (iteration < byIterations.max)
-                    setTimeout(function() { showMovie(iteration + 1) }, 1000);
+                    setTimeout(function() { showBuildProcess(iteration + 1) }, 1000);
+            }
+
+            // показать процесс обхода дерева
+            function showWalkProcess(iteration, nodes) {
+
+                byIterations.value = iteration;
+                currIteration.innerText = byIterations.value;
+                
+                // nodes будет не определён при первом вызове функции
+                if (!nodes) {
+                    draw(byIterations.max);
+                    nodes = tree.walk().names;
+                }
+
+                cy.nodes(`#${nodes[iteration]}`).animate({
+                    style: {
+                        'background-color': '#ff6a6a'
+                    }}).delay(1000);
+
+                if (iteration <= byIterations.max)
+                    setTimeout(function() { showWalkProcess(iteration + 1, nodes) }, 1000);
+                else // сбрасываем стиль
+                    cy.nodes().animate({
+                    style: {
+                        'background-color': '#fff68f'
+                    }}).delay(1000);
             }
         </script>
     </head>
@@ -251,8 +281,9 @@
             </div>
             <div class="row">
                 <div class="three columns" style="text-align: right;">Пошагово</div>
-                <div class="one-half column">
-                    <input id="btnMovie" class="button" type="button" value="Показать процесс построения" onclick="showMovie(0)" disabled>
+                <div class="nine columns">
+                    <input id="btnShowBuildProcess" class="button" type="button" value="Показать процесс построения" onclick="showBuildProcess(0)" disabled>
+                    <input id="btnShowWalkProcess" class="button" type="button" value="Показать процесс обхода" onclick="showWalkProcess(0)" disabled>
                 </div>
             </div>
             

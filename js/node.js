@@ -143,17 +143,27 @@ class Node {
 
     // обход ноды
     walk() {
-        let arr = [];
+        let result = {
+            names: [],
+            values: []
+        };
 
-        if (this.left)
-            arr = arr.concat(this.left.walk());
+        if (this.left) {
+            let lResult = this.left.walk();
+            result.names = result.names.concat(lResult.names);
+            result.values = result.values.concat(lResult.values);
+        }
 
-        arr.push(this.value);
+        result.names.push(this.name);
+        result.values.push(this.value);
 
-        if (this.right)
-            arr = arr.concat(this.right.walk());
+        if (this.right) {
+            let rResult = this.right.walk();
+            result.names = result.names.concat(rResult.names);
+            result.values = result.values.concat(rResult.values);
+        }
 
-        return arr;
+        return result;
     }
 
     // возвращает строку ноды

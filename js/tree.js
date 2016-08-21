@@ -81,7 +81,10 @@ class Tree {
     
     // обход дерева
     walk() {
-        return this.root ? this.root.walk() : [];
+        return this.root ? this.root.walk() : {
+            names: [],
+            values: []
+        };
     }
 
     // очистка дерева
