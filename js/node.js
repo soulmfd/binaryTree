@@ -15,7 +15,9 @@ class Node {
             right: null
         }
 
-        console.log(`нода ${name}:${value} создана в итерации ${iteration}`)
+        this.parent = null;
+
+        //console.log(`нода ${name}:${value} создана в итерации ${iteration}`)
     }
     
 
@@ -128,7 +130,8 @@ class Node {
                 this.right.add(n);
             else {
                 this.right = n;
-                console.log(`${this.name}:${this.value} => правая нода = ${n.name}:${n.value}`);
+                this.right.parent = this.name;
+                //console.log(`${this.name}:${this.value} => правая нода = ${n.name}:${n.value}`);
             }
         }
         else { // добавляемое значение меньше или равно => налево
@@ -136,9 +139,32 @@ class Node {
                 this.left.add(n);
             else {
                 this.left = n;
-                console.log(`${this.name}:${this.value} => левая нода = ${n.name}:${n.value}`);
+                this.left.parent = this.name;
+                //console.log(`${this.name}:${this.value} => левая нода = ${n.name}:${n.value}`);
             }
         }
+    }
+
+    // возвращает ноду по имени
+    get(name) {
+        if (this.name == name)
+            return this;
+
+        if (this.left) {
+            let lResult = this.left.get(name);
+            
+            if (lResult)
+                return lResult;
+        }
+
+        if (this.right) {
+            let rResult = this.right.get(name);
+            
+            if (rResult)
+                return rResult;
+        }
+
+        return null;
     }
 
     // обход ноды

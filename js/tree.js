@@ -71,13 +71,18 @@ class Tree {
 
         let n = new Node(name, value, this.count);
 
-        if (this.root == null)
+        if (!this.root)
             this.dict['root'] = n;
         else
             this.root.add(n);
 
         this.dict['count']++;
     };
+
+    // возвращает ноду по имени
+    get(name) {
+        return this.root ? this.root.get(name) : null;
+    }
     
     // обход дерева
     walk() {

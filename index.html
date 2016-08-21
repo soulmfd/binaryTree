@@ -113,7 +113,10 @@
                                 'text-halign': 'center',
                                 'background-color': '#fff68f',
                                 'width': '25px', 
-                                'height': '25px'
+                                'height': '25px',
+                                'border-width': '1px',
+                                'border-style': 'insert',
+                                'border-color': '#dcdcdc'
                             }
                         },
                         
@@ -129,7 +132,7 @@
 
                 cy.zoom(1);
                 cy.minZoom(0.25);
-                cy.maxZoom(1);
+                cy.maxZoom(1.5);
 
                 if (iteration)
                     drawNode(tree.root, 0, 0, 200, iteration);
@@ -139,6 +142,7 @@
                 cy.fit();
 			};
 
+            // отрисовка ноды
             function drawNode(n, x, y, s, iteration) {
                 if (iteration && n.iteration > iteration)
                     return;
@@ -196,17 +200,44 @@
 
             // показать процесс строительства дерева
             function showBuildProcess(iteration) {
+                // блокируем кнопки
+                let inputElems = document.getElementsByTagName('input');
+
+                for (let i = 0; i < inputElems.length; i++)
+                    inputElems[i].disabled = true;
+
                 byIterations.value = iteration;
                 currIteration.innerText = byIterations.value;
                 //treeStr.innerText = tree.root.toIterationString(iteration);
-                draw(iteration);
+                //draw(iteration);
+
+                if (iteration == 0) {
+                    cy.style().selector('*').style('opacity', '0.001').update();
+                }
+                
+                let currNode = tree.get(`node_${iteration}`);
+                //cy.style().selector(`node#${currNode.name}, edge[target = "${currNode.name}"]`).style('opacity', '1').update();
+                cy.$(`node#${currNode.name}, edge[target = "${currNode.name}"]`).animate({
+                    style: {
+                        'opacity': '1'
+                    }}).delay(1000);
+
 
                 if (iteration < byIterations.max)
                     setTimeout(function() { showBuildProcess(iteration + 1) }, 1000);
+                else { // разблокируем кнопки
+                    for (let i = 0; i < inputElems.length; i++)
+                        inputElems[i].disabled = false;
+                }
             }
 
             // показать процесс обхода дерева
             function showWalkProcess(iteration, nodes) {
+                // блокируем кнопки
+                let inputElems = document.getElementsByTagName('input');
+
+                for (let i = 0; i < inputElems.length; i++)
+                    inputElems[i].disabled = true;
 
                 byIterations.value = iteration;
                 currIteration.innerText = byIterations.value;
@@ -219,16 +250,25 @@
 
                 cy.nodes(`#${nodes[iteration]}`).animate({
                     style: {
-                        'background-color': '#ff6a6a'
+                        //'background-color': '#ff6a6a'
+                        'background-color': '#ff6347',
+                        'border-color': '#00008b'
                     }}).delay(1000);
 
                 if (iteration <= byIterations.max)
                     setTimeout(function() { showWalkProcess(iteration + 1, nodes) }, 1000);
-                else // сбрасываем стиль
-                    cy.nodes().animate({
-                    style: {
-                        'background-color': '#fff68f'
-                    }}).delay(1000);
+                else { // сбрасываем стиль, разблокируем кнопки
+                    setTimeout(function() {
+                        for (let i = 0; i < inputElems.length; i++)
+                            inputElems[i].disabled = false;
+                    
+                        cy.nodes().animate({
+                        style: {
+                            'background-color': '#fff68f',
+                            'border-color': '#dcdcdc'
+                        }}).delay(1000);
+                    }, 1000);
+                }
             }
         </script>
     </head>
@@ -258,16 +298,16 @@
                     <input class="u-full-width" id="randomCount" type="number" placeholder="100" value="50" min="1" max="100">
                 </div>
                 <div class="seven columns">
-                    <input class="button" type="button" value="Сгенерировать массив случайных чисел" onclick="addRandom(parseInt(randomCount.value))">
+                    <input id="btnAddRandom" class="button" type="button" value="Сгенерировать массив случайных чисел" onclick="addRandom(parseInt(randomCount.value))">
                 </div>
             </div>
             <div class="row">
                 <div class="three columns" style="text-align: right;">Добавить число</div>
                 <div class="two columns">
-                    <input class="u-full-width" id="inDigit" type="number" placeholder="0" min="-1000" max="1000">
+                    <input id="inDigit" class="u-full-width" type="number" placeholder="0" min="-1000" max="1000">
                 </div>
                 <div class="seven columns">
-                    <input class="button" type="button" value="Добавить" onclick="addDigit(parseInt(inDigit.value), true)">
+                    <input id="btnAddDigit" class="button" type="button" value="Добавить" onclick="addDigit(parseInt(inDigit.value), true)">
                 </div>
             </div>
             <div class="row">
