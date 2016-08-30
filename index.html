@@ -212,7 +212,11 @@
                 //draw(iteration);
 
                 if (iteration == 0) {
-                    cy.style().selector('*').style('opacity', '0.001').update();
+                    //cy.style().selector('*').style('opacity', '0.001').update();
+                    cy.$('*').animate({
+                        style: {
+                            'opacity': '0.001'
+                        }}).delay(0);
                 }
                 
                 let currNode = tree.get(`node_${iteration}`);
